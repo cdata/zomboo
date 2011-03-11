@@ -34,8 +34,10 @@ connect(
 
                                     util.log('Got to the board. Checking out one of the posts.. ');
 
+                                    var links = browser.querySelectorAll('a[href^="res/"]');
+
                                     browser.clickLink(
-                                        'a[href^="res/"]:first',
+                                        'a[href^="res/"]:eq(' + Math.floor(Math.random() * links.length) + ')',
                                         function(err, browser, status) {
 
                                             if(!err) {
@@ -47,7 +49,6 @@ connect(
                                                 util.log('Found an image! Proxying ' + src);
 
                                                 http.get(
-
                                                     {
                                                         host: "images.4chan.org",
                                                         port: 80,
@@ -108,5 +109,4 @@ connect(
             );
         }
     )
-
 ).listen(7331);
