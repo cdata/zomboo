@@ -44,47 +44,53 @@ connect(
 
                                                 var images = browser.querySelectorAll('a[href^="http://images.4chan.org"]'),
                                                     target = images[Math.floor(Math.random()) * images.length],
-                                                    src = target.attributes['1'].nodeValue;
+                                                    src = target ? target.attributes['1'].nodeValue : undefined;
 
-                                                util.log('Found an image! Proxying ' + src);
+                                                if(target) {
+                                                    util.log('Found an image! Proxying ' + src);
 
-                                                http.get(
-                                                    {
-                                                        host: "images.4chan.org",
-                                                        port: 80,
-                                                        path: src
-                                                    },
-                                                    function(res) {
+                                                    http.get(
+                                                        {
+                                                            host: "images.4chan.org",
+                                                            port: 80,
+                                                            path: src
+                                                        },
+                                                        function(res) {
 
-                                                        if(res.statusCode == 200) {
+                                                            if(res.statusCode == 200) {
 
-                                                            util.log('Sending image back to client..');
-                                                            userRes.writeHead(
-                                                                200,
-                                                                res.headers
-                                                            );
+                                                                util.log('Sending image back to client..');
+                                                                userRes.writeHead(
+                                                                    200,
+                                                                    res.headers
+                                                                );
 
-                                                            res.on(
-                                                                'data',
-                                                                function(data) {
+                                                                res.on(
+                                                                    'data',
+                                                                    function(data) {
 
-                                                                    userRes.write(data);
-                                                                }
-                                                            ).on(
-                                                                'end',
-                                                                function() {
+                                                                        userRes.write(data);
+                                                                    }
+                                                                ).on(
+                                                                    'end',
+                                                                    function() {
 
-                                                                    util.log('Done!');
-                                                                    userRes.end();
-                                                                }
-                                                            );
-                                                        } else {
+                                                                        util.log('Done!');
+                                                                        userRes.end();
+                                                                    }
+                                                                );
+                                                            } else {
 
-                                                            userRes.end();
-                                                            util.log("ERROR: Got " + res.statusCode + " while trying to retrieve " + src);
+                                                                userRes.end();
+                                                                util.log("ERROR: Got " + res.statusCode + " while trying to retrieve " + src);
+                                                            }
                                                         }
-                                                    }
-                                                );
+                                                    );
+                                                } else { 
+
+                                                    userRes.write("Sorry, there weren't any images in the post :(");
+                                                    userRes.end();
+                                                }
                                             } else {
 
                                                 userRes.end();
